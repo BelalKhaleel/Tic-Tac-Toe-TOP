@@ -108,20 +108,17 @@ function GameController(
     const gameBoard = gameboard.getBoard();
     // Row check
     if (gameBoard[row].every((cell) => cell.getValue() === player)) {
-      console.log('row win!')
       return true;
     }
 
     // Column check
     if (gameBoard.every((row) => row[column].getValue() === player)) {
-      console.log('column win!')
       return true;
     }
 
     // Primary diagonal check (top-left to bottom-right)
     if (row === column) {
       if (gameBoard.every((row, column) => row[column].getValue() === player)) {
-        // console.log('diagonal win!');
         return true;
       }
     }
@@ -133,12 +130,17 @@ function GameController(
           (row, index) => row[gameBoard.length - 1 - index].getValue() === player
         )
       ) {
-        console.log('diagonal win!');
         return true;
       }
     }
 
     return false;
+  };
+
+  const checkForDraw = () => {
+    return gameboard.getBoard().every(row => 
+      row.every(cell => cell.getValue() !== "")
+    );
   };
 
   const playRound = (row, column) => {
@@ -153,6 +155,12 @@ function GameController(
       // Handle win (e.g., stop the game, display a message, etc.)
       gameboard.printBoard();
       console.log(`${getActivePlayer().name} wins!`);
+      return;
+    }
+
+    if (checkForDraw()) {
+      gameboard.printBoard();
+      console.log("It's a draw!");
       return;
     }
 
