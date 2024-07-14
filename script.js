@@ -20,7 +20,7 @@ function Gameboard() {
 
   const printBoard = () => {
     const boardWithCellValues = board.map((row) =>
-      row.map((cell) => cell.getValue())
+      row.map(cell => cell.getValue())
     );
     console.log(boardWithCellValues);
   };
@@ -31,12 +31,15 @@ function Gameboard() {
 function Cell() {
   let value = "";
 
-  const addMarker = (playerMarker) => (value = playerMarker);
+  const addMarker = playerMarker => (value = playerMarker);
+
+  const resetMarker = () => (value = "");
 
   const getValue = () => value;
 
   return {
     addMarker,
+    resetMarker,
     getValue,
   };
 }
@@ -75,11 +78,11 @@ function GameController(
   const checkForWin = (row, column, player) => {
     const gameBoard = gameboard.getBoard();
 
-    if (gameBoard[row].every((cell) => cell.getValue() === player)) {
+    if (gameBoard[row].every(cell => cell.getValue() === player)) {
       return true;
     }
 
-    if (gameBoard.every((row) => row[column].getValue() === player)) {
+    if (gameBoard.every(row => row[column].getValue() === player)) {
       return true;
     }
 
@@ -106,7 +109,7 @@ function GameController(
   const checkForDraw = () => {
     return gameboard
       .getBoard()
-      .every((row) => row.every((cell) => cell.getValue() !== ""));
+      .every(row => row.every(cell => cell.getValue() !== ""));
   };
 
   let gameActive = true;
@@ -139,7 +142,17 @@ function GameController(
 
     switchPlayerTurn();
     printNewRound();
-  };
+  }
+
+  const resetGame = () => {
+    gameActive = true;
+    activePlayer = players[0];
+    for (let i = 0; i < gameboard.getBoard().length; i++) {
+      for (let j = 0; j < gameboard.getBoard()[i].length; j++) {
+        gameboard.getBoard()[i][j].resetMarker();
+      }
+    }
+  }
 
   printNewRound();
 
@@ -150,6 +163,7 @@ function GameController(
     getGameState,
     checkForWin,
     checkForDraw,
+    resetGame
   };
 }
 
@@ -158,6 +172,7 @@ function GameController(
   const playerTurnDiv = document.querySelector(".turn");
   const boardDiv = document.querySelector(".board");
   const resultDiv = document.querySelector(".result");
+  const resetButton = document.querySelector('.reset');
 
   const updateScreen = () => {
     boardDiv.textContent = "";
@@ -165,11 +180,10 @@ function GameController(
     const board = game.getBoard();
     const activePlayer = game.getActivePlayer();
 
-    if (game.getGameState()) {
-      playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
-    } else {
-      playerTurnDiv.style.display = "none";
-    }
+    playerTurnDiv.style.display = 'block';
+    playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
+
+    resultDiv.textContent = '';
 
     board.forEach((row) => {
       row.forEach((cell, index) => {
@@ -185,6 +199,7 @@ function GameController(
   };
 
   boardDiv.addEventListener("click", (e) => {
+    if (!game.getGameState()) return;
     const selectedRow = e.target.dataset.row;
     const selectedColumn = e.target.dataset.column;
     if (!selectedColumn || !selectedRow) return;
@@ -199,10 +214,17 @@ function GameController(
       const activePlayer = game.getActivePlayer();
       if (game.checkForWin(selectedRow, selectedColumn, activePlayer.marker)) {
         resultDiv.textContent = `${activePlayer.name} wins!`;
+        playerTurnDiv.style.display = 'none';
       } else if (game.checkForDraw()) {
         resultDiv.textContent = "It's a draw!";
+        playerTurnDiv.style.display = 'none';
       }
     }
+  });
+
+  resetButton.addEventListener("click", () => {
+    game.resetGame();
+    updateScreen();
   });
 
   updateScreen();
