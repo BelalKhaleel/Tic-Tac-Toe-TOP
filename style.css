@@ -6,19 +6,24 @@
   padding: 0;
 }
 
+body {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   gap: 1em;
-  min-height: 100vh;
+  width: 500px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  width: 500px;
+  width: 100%;
 }
 
 .reset {
@@ -29,7 +34,7 @@
 .board {
   display: grid;
   height: 500px;
-  width: 500px;
+  width: 100%;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   border: 1px solid black;
